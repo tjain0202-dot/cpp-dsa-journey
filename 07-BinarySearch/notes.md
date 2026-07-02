@@ -1,245 +1,334 @@
-# Binary Search Notes
+---
 
-## Prerequisites
+# Binary Search on Answer
 
-- Array must be sorted.
-- Search space is reduced by half every iteration.
+## What changes?
+
+Normal Binary Search searches over **array indices**.
+
+Binary Search on Answer searches over the **possible answers**.
+
+The answer space must satisfy the **monotonic property**.
 
 ---
 
-# Time Complexity
+## General Pattern
 
-| Algorithm | Time | Space |
-|-----------|------|-------|
-| Binary Search | O(log n) | O(1) |
+1. Identify the answer space.
+2. Choose `low` and `high`.
+3. Write a feasibility function.
+4. Binary Search over the answer space.
 
----
-
-# Safe Mid Formula
+Template
 
 ```cpp
-int mid = l + (r - l) / 2;
-```
+while(low <= high)
+{
+    int mid = low + (high-low)/2;
 
-Avoid
-
-```cpp
-int mid = (l + r) / 2;
-```
-
-Reason:
-- `l + r` may overflow for very large values.
-
----
-
-# Standard Binary Search
-
-Goal:
-- Find exact target.
-
-Condition
-
-```cpp
-while (l <= r)
-```
-
-Cases
-
-```
-nums[mid] == target
-    return mid
-
-nums[mid] < target
-    l = mid + 1
-
-nums[mid] > target
-    r = mid - 1
-```
-
-Return
-
-```
--1
+    if(feasible(mid))
+    {
+        // depends on problem
+    }
+    else
+    {
+        // opposite direction
+    }
+}
 ```
 
 ---
 
-# Search Insert Position
+# Allocate Books
+
+## Answer Space
+
+```
+low = largest book
+
+high = total pages
+```
+
+Reason
+
+A student must receive complete books.
+
+The answer can never be
+
+- smaller than the largest book
+- larger than the total pages
+
+---
+
+## Feasibility Function
+
+Maintain
+
+```cpp
+currentPages
+studentsUsed
+```
+
+When
+
+```cpp
+currentPages + arr[i] > limit
+```
+
+move to the next student.
+
+---
+
+## Early Exit
+
+```cpp
+if(arr[i] > limit)
+    return false;
+```
+
+Reason
+
+A single book already exceeds the allowed limit.
+
+---
+
+## Binary Search Direction
 
 Goal
 
-Return
-
-- target index if present
-- otherwise insertion position
-
-Idea
-
-When binary search finishes,
+Find the **minimum feasible** answer.
 
 ```
-l
-```
+Possible
+    search left
 
-is exactly the insertion index.
+Not Possible
+    search right
+```
 
 Return
 
 ```cpp
-return l;
+low
 ```
 
 ---
 
-# First Occurrence
+# Aggressive Cows
+
+## Answer Space
+
+```
+low = 1
+
+high = lastStall - firstStall
+```
+
+Reason
+
+We search over **distances**, not stall positions.
+
+---
+
+## Preprocessing
+
+Always sort the stalls.
+
+```cpp
+sort(stalls, stalls + size);
+```
+
+Reason
+
+The greedy placement only works when stalls are visited from left to right.
+
+---
+
+## Feasibility Function
+
+Maintain
+
+```cpp
+lastCowPlaced
+
+cowsPlaced
+```
+
+When
+
+```cpp
+stalls[i] - lastCowPlaced >= distance
+```
+
+place another cow.
+
+---
+
+## Early Exit
+
+```cpp
+if(cowsPlaced == m)
+    return true;
+```
+
+Reason
+
+The moment all cows are placed, the answer is already proven.
+
+---
+
+## Binary Search Direction
 
 Goal
 
-Find leftmost occurrence.
+Find the **maximum feasible** answer.
 
-Condition
+```
+Possible
+    search right
 
-```cpp
-if(nums[mid] >= target)
-    r = mid - 1;
-else
-    l = mid + 1;
+Not Possible
+    search left
 ```
 
 Return
 
 ```cpp
-l
+high
 ```
 
 ---
 
-# Last Occurrence
+# My Common Mistakes
 
-Goal
+## Mistake 1
 
-Find rightmost occurrence.
+Started coding before identifying the answer space.
 
-Condition
+Correct approach:
 
-```cpp
-if(nums[mid] <= target)
-    l = mid + 1;
-else
-    r = mid - 1;
+First ask
+
 ```
-
-Return
-
-```cpp
-r
+What am I binary searching on?
 ```
 
 ---
 
-# Lower Bound
+## Mistake 2
 
-Definition
+Tried to prove the answer instead of checking feasibility.
 
-First element
+Correct approach:
+
+The feasibility function should answer only one question.
 
 ```
->= target
-```
-
-Return
-
-```cpp
-l
-```
-
-Equivalent to STL
-
-```cpp
-lower_bound(begin,end,target)
+Is this value possible?
 ```
 
 ---
 
-# Upper Bound
+## Mistake 3
 
-Definition
+Confused stall position with distance.
 
-First element
-
-```
-> target
-```
-
-Return
+Wrong
 
 ```cpp
-l
+if(stalls[i] < distance)
 ```
 
-Equivalent to STL
+Correct
 
 ```cpp
-upper_bound(begin,end,target)
+if(stalls[i] - lastCowPlaced >= distance)
 ```
+
+Only the distance between cows matters.
 
 ---
 
-# Count Occurrences
+## Mistake 4
 
-Formula
+Stored
 
 ```cpp
-lastOccurrence - firstOccurrence + 1
+lastCowPlaced = 1;
 ```
+
+Correct
+
+```cpp
+lastCowPlaced = stalls[0];
+```
+
+Store the position of the last placed cow.
 
 ---
 
-# Important Observations
+## Mistake 5
 
-✔ Binary Search always shrinks the search space.
+Forgot that some problems require sorting before Binary Search.
 
-✔ Never do
-
-```cpp
-l++;
-r--;
-```
-
-because that becomes linear shrinking.
-
-Instead
-
-```cpp
-l = mid + 1;
-r = mid - 1;
-```
+Always check whether the greedy traversal depends on sorted order.
 
 ---
 
-# Common Mistakes
+## Mistake 6
 
-❌ mid = (l+r)/2
+Confused Binary Search direction.
 
-❌ while(l<r)
+### First Feasible
 
-❌ Using Binary Search on an unsorted array
+```
+true  -> left
 
-❌ Returning r instead of l for Lower Bound
+false -> right
 
-❌ Returning l instead of r for Last Occurrence
+return low
+```
 
-❌ Forgetting that lower_bound and upper_bound may return end()
+Examples
+
+- Search Insert Position
+- Lower Bound
+- Allocate Books
+- Ship Packages
+- Koko Eating Bananas
 
 ---
 
-# STL Mapping
+### Last Feasible
 
-| Problem | Return |
-|---------|--------|
-| Binary Search | index / -1 |
-| Search Insert | l |
-| First Occurrence | lower_bound |
-| Last Occurrence | upper_bound - 1 |
-| Lower Bound | first >= target |
-| Upper Bound | first > target |
+```
+true  -> right
+
+false -> left
+
+return high
+```
+
+Examples
+
+- Aggressive Cows
+
+---
+
+# Binary Search on Answer Checklist
+
+Before writing code, answer these questions.
+
+□ What is the answer space?
+
+□ What are `low` and `high`?
+
+□ Is the property monotonic?
+
+□ What should the feasibility function return?
+
+□ What state variables should it maintain?
+
+□ Am I searching for the first feasible answer or the last feasible answer?
+
+□ Is preprocessing (sorting) required?

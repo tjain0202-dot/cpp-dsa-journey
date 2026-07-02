@@ -17,6 +17,8 @@ int lowerbound(int nums[], int size,int target){
 int main(){
     int nums[]={1,2,3,3,3,4,5,6,9};
     int size=sizeof(nums)/sizeof(nums[0]);
-    int target =3;
-    cout<<lowerbound(nums,size,target);
+    int target =7;
+    int m=lowerbound(nums,size,target);
+    cout<<m<<endl;
+    cout<<nums[m]<<endl;
 }

@@ -21,7 +21,7 @@ int searchInsert(int nums[], int size, int target){
 int main(){
     int nums[] = {1,3,5,6};
     int size = sizeof(nums)/sizeof(nums[0]);
-    int target = 2;
+    int target = -1;
     cout<<searchInsert(nums,size,target);
 
 }

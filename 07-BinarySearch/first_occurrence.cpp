@@ -21,8 +21,8 @@ int firstOcurence(int nums[], int size, int target)
 }
 int main()
 {
-    int nums[] = {1, 2, 2, 2, 2, 5, 6};
+    int nums[] = {1, 2, 2, 2, 2, 5,5,5,5,5,5, 6,6,6,6,6};
     int size = sizeof(nums) / sizeof(nums[0]);
-    int target = 2;
+    int target = 9;
     cout << firstOcurence(nums, size, target);
 }
